@@ -94,7 +94,7 @@ namespace Fusee.Tutorial.Core
             RC.Clear(ClearFlags.Color | ClearFlags.Depth);
 
             // Animate the camera angle
-            _camAngle = _camAngle + 20.0f * M.Pi/180.0f * DeltaTime;    //Drehung von 90° pro Sekunde, egal wie mit vielen Frames die Animation läuft
+             _camAngle = _camAngle + 20.0f * M.Pi/180.0f * DeltaTime;    //Drehung von 90° pro Sekunde (bei 90*M.Pi/180), egal wie mit vielen Frames die Animation läuft
 
             // Setup the camera 
             RC.View = float4x4.CreateTranslation(0, 0, 50) * float4x4.CreateRotationY(_camAngle);
@@ -105,11 +105,11 @@ namespace Fusee.Tutorial.Core
             _cube3Transform.Translation = new float3(-20,5, 5 * M.Sin(1.5f*TimeSinceStart));
             _cube3Transform.Rotation = new float3(0, 0, (-M.Pi/4 * TimeSinceStart));
             cube3Shader.Effect = SimpleMeshes.MakeShaderEffect (new float3(0.5f * M.Sin(2*TimeSinceStart)+0.5f, 0.09f, 0.3f), new float3(1,1,1), 4);
-            
 
             // Render the scene on the current render context
             _sceneRenderer.Render(RC);
 
+            Diagnostics.Log(Time.DeltaTime);
             // Swap buffers: Show the contents of the backbuffer (containing the currently rendered farame) on the front buffer.
             Present();
         }
