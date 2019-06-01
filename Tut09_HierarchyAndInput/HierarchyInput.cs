@@ -20,6 +20,11 @@ namespace Fusee.Tutorial.Core
         private SceneRenderer _sceneRenderer;
         private float _camAngle = 0;
         private TransformComponent _baseTransform;
+        private TransformComponent _bodyTransform;
+        private TransformComponent _upperArmTransform;
+        private TransformComponent _foreArmTransform;
+        private TransformComponent _greifLeftTransform;
+        private TransformComponent _greifRightTransform;
 
         SceneContainer CreateScene()
         {
@@ -30,6 +35,37 @@ namespace Fusee.Tutorial.Core
                 Scale = new float3(1, 1, 1),
                 Translation = new float3(0, 0, 0)
             };
+            _bodyTransform = new TransformComponent
+            {
+               Rotation = new float3(0, -45 * M.Pi / 180, 0), 
+               Scale = new float3(1, 1, 1),
+               Translation = new float3(0, 6, 0)
+            };
+            _upperArmTransform = new TransformComponent
+            {
+               Rotation = new float3(38 * M.Pi / 180, 0, 0), 
+               Scale = new float3(1, 1, 1),
+               Translation = new float3(2, 4, 0)
+            };
+            _foreArmTransform = new TransformComponent
+            {
+               Rotation = new float3(90 * M.Pi / 180, 0 , 0),
+               Scale = new float3(1, 1, 1),
+               Translation = new float3(-2, 4, 0)
+            };
+            _greifLeftTransform = new TransformComponent
+            {
+               Rotation = new float3(0, 0, 45 * M.Pi / 180), 
+               Scale = new float3(1, 1, 1),
+               Translation = new float3(-1, 5, 0)
+            };
+            _greifRightTransform = new TransformComponent
+            {
+                Rotation = new float3(0, 0, -45 * M.Pi / 180),
+                Scale = new float3(1, 1, 1),
+                Translation = new float3(1, 5, 0)
+            };
+            
 
             // Setup the scene graph
             return new SceneContainer
@@ -51,6 +87,163 @@ namespace Fusee.Tutorial.Core
 
                             // MESH COMPONENT
                             SimpleMeshes.CreateCuboid(new float3(10, 2, 10))
+                        },
+                        
+                        Children = new List<SceneNodeContainer>
+                        {
+                            //roter Arm/ roter Body
+                            new SceneNodeContainer
+                            {
+                                Components = new List<SceneComponentContainer>
+                                {
+                                    _bodyTransform,
+
+                                    new ShaderEffectComponent
+                                    {
+                                        Effect = SimpleMeshes.MakeShaderEffect(new float3(0.83f, 0.13f, 0.18f), new float3(0.7f, 0.7f, 0.7f), 5)
+                                    },
+
+                                    SimpleMeshes.CreateCuboid(new float3(2, 10, 2))
+                                },
+
+                                Children = new List<SceneNodeContainer>
+                                {
+                                    //grüner Arm
+                                    new SceneNodeContainer
+                                    {
+                                        Components = new List<SceneComponentContainer>
+                                        {
+                                            _upperArmTransform //extra Koordinatensystem für Rotation um bestimmten Punkt eingefügt als extra Child
+                                        },
+
+                                        Children = new List<SceneNodeContainer>
+                                        {
+                                            new SceneNodeContainer
+                                            {
+                                                Components = new List<SceneComponentContainer>
+                                                {
+                                                    new TransformComponent
+                                                    {
+                                                        Rotation = new float3(0, 0, 0), 
+                                                        Scale = new float3(1, 1, 1),
+                                                        Translation = new float3(0, 4, 0)
+                                                    },
+
+                                                    new ShaderEffectComponent
+                                                    {
+                                                        Effect = SimpleMeshes.MakeShaderEffect(new float3(0.23f, 0.64f, 0.34f), new float3(0.7f, 0.7f, 0.7f), 5)
+                                                    },
+
+                                                    SimpleMeshes.CreateCuboid(new float3(2, 10, 2))
+                                                },
+
+                                                Children = new List<SceneNodeContainer>
+                                                {
+                                                    //blauer Arm
+                                                    new SceneNodeContainer
+                                                    {
+                                                        Components = new List<SceneComponentContainer>
+                                                        {
+                                                            _foreArmTransform //extra Koordinatensystem für Rotation um bestimmten Punkt eingefügt als extra Child
+                                                        },
+
+                                                        Children = new List<SceneNodeContainer>
+                                                        {
+                                                            new SceneNodeContainer
+                                                            {
+                                                                Components = new List<SceneComponentContainer>
+                                                                {
+                                                                    new TransformComponent
+                                                                    {
+                                                                        Rotation = new float3(0, 0, 0), 
+                                                                        Scale = new float3(1, 1, 1),
+                                                                        Translation = new float3(0, 4, 0)
+                                                                    },
+
+                                                                    new ShaderEffectComponent
+                                                                    {
+                                                                        Effect = SimpleMeshes.MakeShaderEffect(new float3(0.13f, 0.21f, 0.61f), new float3(0.7f, 0.7f, 0.7f), 5)
+                                                                    },
+
+                                                                    SimpleMeshes.CreateCuboid(new float3(2, 10, 2))
+                                                                },
+
+                                                                //Greifarme
+                                                                Children = new List<SceneNodeContainer>
+                                                                {
+                                                                    //Linker Arm
+                                                                    new SceneNodeContainer
+                                                                    {
+                                                                        Components = new List<SceneComponentContainer>
+                                                                        {
+                                                                            _greifLeftTransform
+                                                                        },
+
+                                                                        Children = new List<SceneNodeContainer>
+                                                                        {
+                                                                            new SceneNodeContainer
+                                                                            {
+                                                                                Components = new List<SceneComponentContainer>
+                                                                                {
+                                                                                    new TransformComponent
+                                                                                    {
+                                                                                        Rotation = new float3(0, 0, 0),
+                                                                                        Scale = new float3(1, 1, 1),
+                                                                                        Translation = new float3(0, 1.25f, 0)
+                                                                                    },
+
+                                                                                    new ShaderEffectComponent
+                                                                                    {
+                                                                                        Effect = SimpleMeshes.MakeShaderEffect(new float3(0, 0.84f, 1.0f), new float3(0.7f, 0.7f, 0.7f),5)
+                                                                                    },
+
+                                                                                    SimpleMeshes.CreateCuboid(new float3(1, 2.5f, 1))
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    
+                                                                    //Rechter Arm
+                                                                    new SceneNodeContainer
+                                                                    {
+                                                                        Components = new List<SceneComponentContainer>
+                                                                        {
+                                                                            _greifRightTransform
+                                                                        },
+
+                                                                        Children = new List<SceneNodeContainer>
+                                                                        {
+                                                                            new SceneNodeContainer
+                                                                            {
+                                                                                Components = new List<SceneComponentContainer>
+                                                                                {
+                                                                                    new TransformComponent
+                                                                                    {
+                                                                                        Rotation = new float3(0, 0, 0),
+                                                                                        Scale = new float3(1, 1, 1),
+                                                                                        Translation = new float3(0, 1.25f, 0)
+                                                                                    },
+
+                                                                                    new ShaderEffectComponent
+                                                                                    {
+                                                                                        Effect = SimpleMeshes.MakeShaderEffect(new float3(0, 0.84f, 1.0f), new float3(0.7f, 0.7f, 0.7f),5)
+                                                                                    },
+
+                                                                                    SimpleMeshes.CreateCuboid(new float3(1, 2.5f, 1))
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -61,7 +254,7 @@ namespace Fusee.Tutorial.Core
         public override void Init()
         {
             // Set the clear color for the backbuffer to white (100% intensity in all color channels R, G, B, A).
-            RC.ClearColor = new float4(0.8f, 0.9f, 0.7f, 1);
+            RC.ClearColor = new float4(0.0f, 0.2f, 0.2f, 1);
 
             _scene = CreateScene();
 
@@ -72,6 +265,31 @@ namespace Fusee.Tutorial.Core
         // RenderAFrame is called once a frame
         public override void RenderAFrame()
         {
+            //Roboter mit Tastatur steuern können
+            //Body
+            float bodyRot = _bodyTransform.Rotation.y;
+            bodyRot += 0.4f * Keyboard.LeftRightAxis * Time.DeltaTime;
+            _bodyTransform.Rotation = new float3(0, bodyRot, 0);
+            //UpperArm
+            float upperArmRot = _upperArmTransform.Rotation.x;
+            upperArmRot += 0.4f * Keyboard.UpDownAxis * Time.DeltaTime;
+            _upperArmTransform.Rotation = new float3(upperArmRot, 0, 0);
+            //ForeArm
+            float foreArmRot = _foreArmTransform.Rotation.x;
+            foreArmRot += 0.4f * Keyboard.WSAxis * Time.DeltaTime;
+            _foreArmTransform.Rotation = new float3(foreArmRot, 0, 0);
+
+            //Greifarme
+            //GreifarmBegrenzungLinks();
+            //GreifarmBegrenzungRechts();
+            GreifarmBegrenzungLinks();
+            GreifarmBegrenzungRechts();
+                
+
+            //Maussteuerung
+            if(Mouse.LeftButton)
+              _camAngle += 0.01f * Mouse.Velocity.x * Time.DeltaTime;
+            
             // Clear the backbuffer
             RC.Clear(ClearFlags.Color | ClearFlags.Depth);
 
@@ -100,6 +318,47 @@ namespace Fusee.Tutorial.Core
             // Back clipping happens at 2000 (Anything further away from the camera than 2000 world units gets clipped, polygons will be cut)
             var projection = float4x4.CreatePerspectiveFieldOfView(M.PiOver4, aspectRatio, 1, 20000);
             RC.Projection = projection;
+        }
+
+        public void GreifarmBegrenzungLinks()
+        {
+            float leftArmRot = _greifLeftTransform.Rotation.z;
+            leftArmRot += 0.4f * Keyboard.ADAxis * Time.DeltaTime;
+            //außen
+            if(leftArmRot >= 45 * M.Pi / 180)
+            {
+                leftArmRot = 45 * M.Pi / 180;
+                _greifLeftTransform.Rotation = new float3(0, 0, leftArmRot);
+            }    
+            //innen
+            else if(leftArmRot <= -11.26f * M.Pi / 180)
+            {
+                leftArmRot = -11.26f * M.Pi / 180;
+                _greifLeftTransform.Rotation = new float3(0, 0, leftArmRot);
+            }else
+            {
+                _greifLeftTransform.Rotation = new float3(0, 0, leftArmRot);
+            }  
+        }
+        public void GreifarmBegrenzungRechts()
+        {
+            float rightArmRot = _greifRightTransform.Rotation.z;
+            rightArmRot += -0.4f * Keyboard.ADAxis * Time.DeltaTime;
+            //außen
+            if(rightArmRot <= -45 * M.Pi / 180)
+            {
+                rightArmRot = -45 * M.Pi / 180;
+                _greifRightTransform.Rotation = new float3(0, 0, rightArmRot);
+            }    
+            //innen
+            else if(rightArmRot >= 11.26f * M.Pi / 180)
+            {
+                rightArmRot = 11.26f * M.Pi / 180;
+                _greifRightTransform.Rotation = new float3(0, 0, rightArmRot);
+            }else
+            {
+                _greifRightTransform.Rotation = new float3(0, 0, rightArmRot);
+            }  
         }
     }
 }
