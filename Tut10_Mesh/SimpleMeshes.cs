@@ -175,7 +175,105 @@ namespace Fusee.Tutorial.Core
 
         public static Mesh CreateCylinder(float radius, float height, int segments)
         {
-            return CreateConeFrustum(radius, radius, height, segments);
+            float3[] verts = new float3[4 * segments + 2]; //ein Vertex pro Segment und einen für den Mittelpunkt
+            float3[] norms = new float3[4 * segments + 2]; //eine Normale pro Vertex
+            ushort[] tris = new ushort[4 * 3 * segments]; //Ein Dreieck pro Segment. Jedes Dreieck wird aus 3 Indizes(mehrzahl Index) gemacht
+            
+            float delta = 2 * M.Pi / segments; //Winkel für einzelne Dreiecke wird berechnet
+            
+            
+            //Mittelpunkt des Deckels
+            verts[4 * segments] = new float3(0, 0.5f * height, 0); //Mittelpunkt oben
+            norms[4 * segments] = new float3(0,1,0); //entspricht (0,1,0), damit normale nach oben zeigt
+
+            //Mittelpunkt Boden
+            verts[4 * segments + 1] = new float3(0, -0.5f * height, 0);
+            norms[4 * segments + 1] = new float3(0,-1,0);
+            
+            // Initialisierung erster und letzter Punkt vom Deckel, da die Schleife erst bei 1 anfängt
+            verts[0] = new float3(radius, 0.5f * height, 0);
+            norms[0] = new float3(0,1,0);
+            verts[1] = new float3(radius, 0.5f * height, 0);
+            norms[1] = float3.UnitX;
+
+            // Initialisierung erster und letzter Punkt Boden, da die Schleife erst bei 1 anfängt
+            verts[2] = new float3(radius, -0.5f * height, 0);
+            norms[2] = new float3(0,-1,0);
+            verts[3] = new float3(radius, -0.5f * height, 0);
+            norms[3] = float3.UnitX;
+
+
+            for(int i=1; i<segments; i++)
+            {
+                //Winkel für die Normale der einzelnen Punkte
+                float x_normale = M.Cos(i*delta);
+                float z_normale = M.Sin(i*delta);
+
+                // Punkt an der Stelle i berechnen (Deckel)
+                verts[4 * i] = new float3(radius * M.Cos(i * delta), 0.5f * height, radius * M.Sin(i * delta));
+                norms[4 * i] = new float3(0, 1, 0); //vertikale Normale
+
+                verts[4 * i + 1] = new float3(radius * M.Cos(i * delta), 0.5f * height, radius * M.Sin(i * delta));
+                norms[4 * i + 1] = new float3(x_normale, 0, z_normale); //horizontale Normale
+
+                // Punkt an der Stelle i berechnen (Boden)
+                verts[4 * i + 2] = new float3(radius * M.Cos(i * delta), -0.5f * height, radius * M.Sin(i * delta));
+                norms[4 * i + 2] = new float3(0, 1, 0); //vertikale Normale
+
+                verts[4 * i + 3] = new float3(radius * M.Cos(i * delta), -0.5f * height, radius * M.Sin(i * delta));
+                norms[4 * i + 3] = new float3(x_normale, 0, z_normale); //horizontale Normale
+
+                // top triangle
+                tris[12*(i-1) + 0] = (ushort) (4 * segments);       // top center point
+                tris[12*(i-1) + 1] = (ushort) (4 * i);      // current top segment point
+                tris[12*(i-1) + 2] = (ushort) (4 * (i - 1));      // previous top segment point
+
+                // side triangle 1
+                tris[12*(i-1) + 3] = (ushort) (4 * (i-1) + 2);      // previous lower shell point
+                tris[12*(i-1) + 4] = (ushort) (4 * i + 2);      // current lower shell point
+                tris[12*(i-1) + 5] = (ushort) (4 * i + 1);      // current top shell point
+
+                // side triangle 2
+                tris[12*(i-1) + 6] = (ushort) (4 * (i-1) + 2);      // previous lower shell point
+                tris[12*(i-1) + 7] = (ushort) (4 * i + 1);      // current top shell point
+                tris[12*(i-1) + 8] = (ushort) (4 * (i-1) + 1);      // previous top shell point
+
+                // bottom triangle
+                tris[12*(i-1) + 9]  = (ushort) (4 * segments + 1);    // bottom center point
+                tris[12*(i-1) + 10] = (ushort) (4 * (i-1) + 3);     // current bottom segment point
+                tris[12*(i-1) + 11] = (ushort) (4 * i + 3);     // previous bottom segment point    
+            }
+
+            //Letztes Segment verbinden
+            //top triangle
+            tris[12 * segments - 1] = (ushort) (4 * segments);    //Mittelpunkt
+            tris[12 * segments - 2] = (ushort) 0;                 //Startpunkt
+            tris[12 * segments - 3] = (ushort)(4 * segments - 4); //letzter Punkt vom Segment
+
+            // side triangle 1
+            tris[12 * segments - 4] = (ushort) (4 * segments -2);   // previous lower shell point
+            tris[12 * segments - 5] = (ushort) (3);                 // current lower shell point
+            tris[12 * segments - 6] = (ushort) (1);                 // current top shell point
+
+            // side triangle 2
+            tris[12*segments - 7] = (ushort) (4 * segments - 2);    // previous lower shell point
+            tris[12*segments - 8] = (ushort) (1);                   // current top shell point
+            tris[12*segments - 9] = (ushort) (4 * segments - 4);    // previous top shell point
+
+            // bottom triangle
+            tris[12*segments - 10]  = (ushort) (4 * segments + 1);  // bottom center point
+            tris[12*segments - 11] = (ushort) (3);                  // current bottom segment point
+            tris[12*segments - 12] = (ushort) (4 * segments - 1);   // previous bottom segment point  
+            
+            return new Mesh
+            {
+                Vertices = verts,
+                Normals = norms,
+                Triangles = tris,
+            };
+            
+            
+            //return CreateConeFrustum(radius, radius, height, segments);
         }
 
         public static Mesh CreateCone(float radius, float height, int segments)
