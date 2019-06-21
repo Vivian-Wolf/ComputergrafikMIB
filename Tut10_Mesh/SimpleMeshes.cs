@@ -177,7 +177,7 @@ namespace Fusee.Tutorial.Core
         {
             float3[] verts = new float3[4 * segments + 2]; //ein Vertex pro Segment und einen für den Mittelpunkt
             float3[] norms = new float3[4 * segments + 2]; //eine Normale pro Vertex
-            ushort[] tris = new ushort[4 * 3 * segments]; //Ein Dreieck pro Segment. Jedes Dreieck wird aus 3 Indizes(mehrzahl Index) gemacht
+            ushort[] tris = new ushort[12 * segments]; //Ein Dreieck pro Segment. Jedes Dreieck wird aus 3 Indizes(mehrzahl Index) gemacht
             
             float delta = 2 * M.Pi / segments; //Winkel für einzelne Dreiecke wird berechnet
             
@@ -198,9 +198,9 @@ namespace Fusee.Tutorial.Core
 
             // Initialisierung erster und letzter Punkt Boden, da die Schleife erst bei 1 anfängt
             verts[2] = new float3(radius, -0.5f * height, 0);
-            norms[2] = new float3(0,-1,0);
+            norms[2] = float3.UnitX;
             verts[3] = new float3(radius, -0.5f * height, 0);
-            norms[3] = float3.UnitX;
+            norms[3] = new float3(0,-1,0);
 
 
             for(int i=1; i<segments; i++)
@@ -224,8 +224,8 @@ namespace Fusee.Tutorial.Core
                 norms[4 * i + 3] = new float3(x_normale, 0, z_normale); //horizontale Normale
 
                 // top triangle
-                tris[12*(i-1) + 0] = (ushort) (4 * segments);       // top center point
-                tris[12*(i-1) + 1] = (ushort) (4 * i);      // current top segment point
+                tris[12*(i-1) + 0] = (ushort) (4 * i);       // top center point
+                tris[12*(i-1) + 1] = (ushort) (4 * segments);      // current top segment point
                 tris[12*(i-1) + 2] = (ushort) (4 * (i - 1));      // previous top segment point
 
                 // side triangle 1
@@ -251,14 +251,14 @@ namespace Fusee.Tutorial.Core
             tris[12 * segments - 3] = (ushort)(4 * segments - 4); //letzter Punkt vom Segment
 
             // side triangle 1
-            tris[12 * segments - 4] = (ushort) (4 * segments -2);   // previous lower shell point
-            tris[12 * segments - 5] = (ushort) (3);                 // current lower shell point
+            tris[12 * segments - 5] = (ushort) (4 * segments -2);   // previous lower shell point
+            tris[12 * segments - 4] = (ushort) (2);                 // current lower shell point
             tris[12 * segments - 6] = (ushort) (1);                 // current top shell point
 
             // side triangle 2
-            tris[12*segments - 7] = (ushort) (4 * segments - 2);    // previous lower shell point
-            tris[12*segments - 8] = (ushort) (1);                   // current top shell point
-            tris[12*segments - 9] = (ushort) (4 * segments - 4);    // previous top shell point
+            tris[12*segments - 8] = (ushort) (4 * segments - 2);    // previous lower shell point
+            tris[12*segments - 7] = (ushort) (1);                   // current top shell point
+            tris[12*segments - 9] = (ushort) (4 * segments - 3);    // previous top shell point
 
             // bottom triangle
             tris[12*segments - 10]  = (ushort) (4 * segments + 1);  // bottom center point

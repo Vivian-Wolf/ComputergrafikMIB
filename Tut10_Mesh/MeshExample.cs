@@ -72,6 +72,7 @@ namespace Fusee.Tutorial.Core
         public override void RenderAFrame()
         {
             _baseTransform.Rotation = new float3(0, 0.5f*M.MinAngle(TimeSinceStart), 0);
+            
 
             // Clear the backbuffer
             RC.Clear(ClearFlags.Color | ClearFlags.Depth);
